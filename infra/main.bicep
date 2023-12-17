@@ -80,7 +80,7 @@ param serverAppSecret string = ''
 param clientAppId string = ''
 @secure()
 param clientAppSecret string = ''
-
+ 
 // Used for optional CORS support for alternate frontends
 param allowedOrigin string = '' // should start with https://, shouldn't end with a /
 
