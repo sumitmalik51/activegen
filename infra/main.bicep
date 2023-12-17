@@ -47,7 +47,7 @@ param computerVisionSecretName string = 'computerVisionSecret'
     type: 'location'
   }
 })
-param resourceGroupNameLocation string
+param resourceGroupNameLocation string =  resourceGroup().location
 
 param openAiSkuName string = 'S0'
 
@@ -251,7 +251,7 @@ var openAiDeployments = concat(defaultOpenAiDeployments, useGPT4V ? [
 
 module openAi 'core/ai/cognitiveservices.bicep' = {
   name: 'openai'
-  Name
+ 
   params: {
     name: !empty(openAiServiceName) ? openAiServiceName : '${abbrs.cognitiveServicesAccounts}${resourceToken}'
     location: resourceGroupNameLocation
