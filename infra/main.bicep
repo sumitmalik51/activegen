@@ -40,13 +40,7 @@ param useGPT4V bool = false
 param keyVaultServiceName string = ''
 param computerVisionSecretName string = 'computerVisionSecret'
 
-@description('Location for the OpenAI resource group')
-@allowed(['canadaeast', 'eastus', 'eastus2', 'francecentral', 'switzerlandnorth', 'uksouth', 'japaneast', 'northcentralus', 'australiaeast', 'swedencentral'])
-@metadata({
-  azd: {
-    type: 'location'
-  }
-})
+
 param resourceGroupNameLocation string =  resourceGroup().location
 
 param openAiSkuName string = 'S0'
