@@ -105,18 +105,11 @@ var keyVaultName = !empty(keyVaultServiceName) ? keyVaultServiceName : '${abbrs.
 var tenantIdForAuth = !empty(authTenantId) ? authTenantId : tenantId
 var authenticationIssuerUri = '${environment().authentication.loginEndpoint}${tenantIdForAuth}/v2.0'
 
-// Organize resources in a resource group
-resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: !empty(resourceGroupName) ? resourceGroupName : '${abbrs.resourcesResourceGroups}${environmentName}'
-  location: location
-  tags: tags
-}
-
 
 // Monitor application with Azure Monitor
 module monitoring 'core/monitor/monitoring.bicep' = if (useApplicationInsights) {
   name: 'monitoring'
-  scope: resourceGroup
+  
   params: {
     location: location
     tags: tags
@@ -128,7 +121,7 @@ module monitoring 'core/monitor/monitoring.bicep' = if (useApplicationInsights) 
 
 module applicationInsightsDashboard 'backend-dashboard.bicep' = if (useApplicationInsights) {
   name: 'application-insights-dashboard'
-  scope: resourceGroup
+  
   params: {
     name: !empty(applicationInsightsDashboardName) ? applicationInsightsDashboardName : '${abbrs.portalDashboards}${resourceToken}'
     location: location
@@ -140,7 +133,7 @@ module applicationInsightsDashboard 'backend-dashboard.bicep' = if (useApplicati
 // Create an App Service Plan to group applications under the same payment plan and SKU
 module appServicePlan 'core/host/appserviceplan.bicep' = {
   name: 'appserviceplan'
-  scope: resourceGroup
+  
   params: {
     name: !empty(appServicePlanName) ? appServicePlanName : '${abbrs.webServerFarms}${resourceToken}'
     location: location
@@ -156,7 +149,7 @@ module appServicePlan 'core/host/appserviceplan.bicep' = {
 // The application frontend
 module backend 'core/host/appservice.bicep' = {
   name: 'web'
-  scope: resourceGroup
+  
   params: {
     name: !empty(backendServiceName) ? backendServiceName : '${abbrs.webSitesAppService}backend-${resourceToken}'
     location: location
@@ -258,7 +251,7 @@ var openAiDeployments = concat(defaultOpenAiDeployments, useGPT4V ? [
 
 module openAi 'core/ai/cognitiveservices.bicep' = {
   name: 'openai'
-  scope: resourceGroupName
+  Name
   params: {
     name: !empty(openAiServiceName) ? openAiServiceName : '${abbrs.cognitiveServicesAccounts}${resourceToken}'
     location: resourceGroupNameLocation
@@ -272,7 +265,6 @@ module openAi 'core/ai/cognitiveservices.bicep' = {
 
 module formRecognizer 'core/ai/cognitiveservices.bicep' = {
   name: 'formrecognizer'
-  scope: formRecognizerResourceGroup
   params: {
     name: !empty(formRecognizerServiceName) ? formRecognizerServiceName : '${abbrs.cognitiveServicesFormRecognizer}${resourceToken}'
     kind: 'FormRecognizer'
@@ -286,7 +278,6 @@ module formRecognizer 'core/ai/cognitiveservices.bicep' = {
 
 module computerVision 'core/ai/cognitiveservices.bicep' = if (useGPT4V) {
   name: 'computerVision'
-  scope: computerVisionResourceGroup
   params: {
     name: computerVisionName
     kind: 'ComputerVision'
@@ -303,7 +294,6 @@ module computerVision 'core/ai/cognitiveservices.bicep' = if (useGPT4V) {
 // which is only used for GPT-4V.
 module keyVault 'core/security/keyvault.bicep' = if (useGPT4V) {
   name: 'keyvault'
-  scope: keyVaultResourceGroup
   params: {
     name: keyVaultName
     location: location
@@ -313,7 +303,6 @@ module keyVault 'core/security/keyvault.bicep' = if (useGPT4V) {
 
 module webKVAccess 'core/security/keyvault-access.bicep' = if (useGPT4V) {
   name: 'web-keyvault-access'
-  scope: keyVaultResourceGroup
   params: {
     keyVaultName: keyVaultName
     principalId: backend.outputs.identityPrincipalId
@@ -322,7 +311,6 @@ module webKVAccess 'core/security/keyvault-access.bicep' = if (useGPT4V) {
 
 module secrets 'secrets.bicep' = if (useGPT4V) {
   name: 'secrets'
-  scope: keyVaultResourceGroup
   params: {
     keyVaultName: keyVaultName
     storeComputerVisionSecret: useGPT4V
@@ -333,7 +321,6 @@ module secrets 'secrets.bicep' = if (useGPT4V) {
 
 module searchService 'core/search/search-services.bicep' = {
   name: 'search-service'
-  scope: searchServiceResourceGroup
   params: {
     name: !empty(searchServiceName) ? searchServiceName : 'gptkb-${resourceToken}'
     location: !empty(searchServiceLocation) ? searchServiceLocation : location
@@ -352,7 +339,6 @@ module searchService 'core/search/search-services.bicep' = {
 
 module storage 'core/storage/storage-account.bicep' = {
   name: 'storage'
-  scope: storageResourceGroup
   params: {
     name: !empty(storageAccountName) ? storageAccountName : '${abbrs.storageStorageAccounts}${resourceToken}'
     location: storageResourceGroupLocation
@@ -377,7 +363,7 @@ module storage 'core/storage/storage-account.bicep' = {
 
 // USER ROLES
 module openAiRoleUser 'core/security/role.bicep' = if (openAiHost == 'azure') {
-  scope: resourceGroupName
+
   name: 'openai-role-user'
   params: {
     principalId: principalId
@@ -387,7 +373,6 @@ module openAiRoleUser 'core/security/role.bicep' = if (openAiHost == 'azure') {
 }
 
 module formRecognizerRoleUser 'core/security/role.bicep' = {
-  scope: formRecognizerResourceGroup
   name: 'formrecognizer-role-user'
   params: {
     principalId: principalId
@@ -397,7 +382,6 @@ module formRecognizerRoleUser 'core/security/role.bicep' = {
 }
 
 module storageRoleUser 'core/security/role.bicep' = {
-  scope: storageResourceGroup
   name: 'storage-role-user'
   params: {
     principalId: principalId
@@ -407,7 +391,6 @@ module storageRoleUser 'core/security/role.bicep' = {
 }
 
 module storageContribRoleUser 'core/security/role.bicep' = {
-  scope: storageResourceGroup
   name: 'storage-contribrole-user'
   params: {
     principalId: principalId
@@ -417,7 +400,6 @@ module storageContribRoleUser 'core/security/role.bicep' = {
 }
 
 module searchRoleUser 'core/security/role.bicep' = {
-  scope: searchServiceResourceGroup
   name: 'search-role-user'
   params: {
     principalId: principalId
@@ -427,7 +409,6 @@ module searchRoleUser 'core/security/role.bicep' = {
 }
 
 module searchContribRoleUser 'core/security/role.bicep' = {
-  scope: searchServiceResourceGroup
   name: 'search-contrib-role-user'
   params: {
     principalId: principalId
@@ -437,7 +418,6 @@ module searchContribRoleUser 'core/security/role.bicep' = {
 }
 
 module searchSvcContribRoleUser 'core/security/role.bicep' = {
-  scope: searchServiceResourceGroup
   name: 'search-svccontrib-role-user'
   params: {
     principalId: principalId
@@ -448,7 +428,7 @@ module searchSvcContribRoleUser 'core/security/role.bicep' = {
 
 // SYSTEM IDENTITIES
 module openAiRoleBackend 'core/security/role.bicep' = if (openAiHost == 'azure') {
-  scope: resourceGroupName
+
   name: 'openai-role-backend'
   params: {
     principalId: backend.outputs.identityPrincipalId
@@ -458,7 +438,6 @@ module openAiRoleBackend 'core/security/role.bicep' = if (openAiHost == 'azure')
 }
 
 module storageRoleBackend 'core/security/role.bicep' = {
-  scope: storageResourceGroup
   name: 'storage-role-backend'
   params: {
     principalId: backend.outputs.identityPrincipalId
@@ -470,7 +449,6 @@ module storageRoleBackend 'core/security/role.bicep' = {
 // Used to issue search queries
 // https://learn.microsoft.com/azure/search/search-security-rbac
 module searchRoleBackend 'core/security/role.bicep' = {
-  scope: searchServiceResourceGroup
   name: 'search-role-backend'
   params: {
     principalId: backend.outputs.identityPrincipalId
@@ -482,7 +460,6 @@ module searchRoleBackend 'core/security/role.bicep' = {
 // Used to read index definitions (required when using authentication)
 // https://learn.microsoft.com/azure/search/search-security-rbac
 module searchReaderRoleBackend 'core/security/role.bicep' = if (useAuthentication) {
-  scope: searchServiceResourceGroup
   name: 'search-reader-role-backend'
   params: {
     principalId: backend.outputs.identityPrincipalId
@@ -494,7 +471,6 @@ module searchReaderRoleBackend 'core/security/role.bicep' = if (useAuthenticatio
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenantId
 output AZURE_AUTH_TENANT_ID string = authTenantId
-output AZURE_RESOURCE_GROUP string = resourceGroup.name
 
 // Shared by all OpenAI deployments
 output OPENAI_HOST string = openAiHost
@@ -502,12 +478,6 @@ output AZURE_OPENAI_EMB_MODEL_NAME string = embeddingModelName
 output AZURE_OPENAI_CHATGPT_MODEL string = chatGptModelName
 output AZURE_OPENAI_GPT4V_MODEL string = gpt4vModelName
 
-// Specific to Azure OpenAI
-output AZURE_OPENAI_SERVICE string = (openAiHost == 'azure') ? openAi.outputs.name : ''
-output AZURE_OPENAI_RESOURCE_GROUP string = (openAiHost == 'azure') ? resourceGroupName.name : ''
-output AZURE_OPENAI_CHATGPT_DEPLOYMENT string = (openAiHost == 'azure') ? chatGptDeploymentName : ''
-output AZURE_OPENAI_EMB_DEPLOYMENT string = (openAiHost == 'azure') ? embeddingDeploymentName : ''
-output AZURE_OPENAI_GPT4V_DEPLOYMENT string = (openAiHost == 'azure') ? gpt4vDeploymentName : ''
 
 // Used only with non-Azure OpenAI deployments
 output OPENAI_API_KEY string = (openAiHost == 'openai') ? openAiApiKey : ''
@@ -518,15 +488,12 @@ output VISION_SECRET_NAME string = useGPT4V ? computerVisionSecretName : ''
 output AZURE_KEY_VAULT_NAME string = useGPT4V ? keyVault.outputs.name : ''
 
 output AZURE_FORMRECOGNIZER_SERVICE string = formRecognizer.outputs.name
-output AZURE_FORMRECOGNIZER_RESOURCE_GROUP string = formRecognizerResourceGroup.name
 
 output AZURE_SEARCH_INDEX string = searchIndexName
 output AZURE_SEARCH_SERVICE string = searchService.outputs.name
-output AZURE_SEARCH_SERVICE_RESOURCE_GROUP string = searchServiceResourceGroup.name
 
 output AZURE_STORAGE_ACCOUNT string = storage.outputs.name
 output AZURE_STORAGE_CONTAINER string = storageContainerName
-output AZURE_STORAGE_RESOURCE_GROUP string = storageResourceGroup.name
 
 output AZURE_USE_AUTHENTICATION bool = useAuthentication
 
