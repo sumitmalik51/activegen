@@ -1,6 +1,6 @@
 {
   "analysisServicesServers": "as",
-  "apiManagementService": "apim-",
+  "apiManagementService": "apim-service-",
   "appConfigurationConfigurationStores": "appcs-",
   "appManagedEnvironments": "cae-",
   "appContainerApps": "ca-",
@@ -11,7 +11,7 @@
   "cacheRedis": "redis-",
   "cdnProfiles": "cdnp-",
   "cdnProfilesEndpoints": "cdne-",
-  "cognitiveServicesAccounts": "cog-",
+  "cognitiveServicesAccounts": "OpenAI-Lab01-",
   "cognitiveServicesFormRecognizer": "cog-fr-",
   "cognitiveServicesComputerVision": "cog-cv-",
   "cognitiveServicesTextAnalytics": "cog-ta-",
