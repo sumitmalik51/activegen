@@ -85,13 +85,13 @@ param clientAppSecret string = ''
 param allowedOrigin string = '' // should start with https://, shouldn't end with a /
 
 @description('Id of the user or app to assign application roles')
-param obj string = 'obj1'
+param principalId string = ''
 
 @description('Use Application Insights for monitoring and performance tracing')
 param useApplicationInsights bool = false
 
 var abbrs = loadJsonContent('abbreviations.json')
-var resourceToken = '1176954'
+var resourceToken = 'resourceTokenvalue'
 var tags = { 'azd-env-name': environmentName }
 var computerVisionName = !empty(computerVisionServiceName) ? computerVisionServiceName : '${abbrs.cognitiveServicesComputerVision}${resourceToken}'
 var keyVaultName = !empty(keyVaultServiceName) ? keyVaultServiceName : '${abbrs.keyVaultVaults}${resourceToken}'
@@ -291,7 +291,7 @@ module keyVault 'core/security/keyvault.bicep' = if (useGPT4V) {
   params: {
     name: keyVaultName
     location: location
-    principalId: obj
+    principalId: principalId
   }
 }
 
@@ -360,7 +360,7 @@ module openAiRoleUser 'core/security/role.bicep' = if (openAiHost == 'azure') {
 
   name: 'openai-role-user'
   params: {
-    principalId: obj
+    principalId: principalId
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
     principalType: 'User'
   }
@@ -369,7 +369,7 @@ module openAiRoleUser 'core/security/role.bicep' = if (openAiHost == 'azure') {
 module formRecognizerRoleUser 'core/security/role.bicep' = {
   name: 'formrecognizer-role-user'
   params: {
-    principalId: obj
+    principalId: principalId
     roleDefinitionId: 'a97b65f3-24c7-4388-baec-2e87135dc908'
     principalType: 'User'
   }
@@ -378,7 +378,7 @@ module formRecognizerRoleUser 'core/security/role.bicep' = {
 module storageRoleUser 'core/security/role.bicep' = {
   name: 'storage-role-user'
   params: {
-    principalId: obj
+    principalId: principalId
     roleDefinitionId: '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
     principalType: 'User'
   }
@@ -387,7 +387,7 @@ module storageRoleUser 'core/security/role.bicep' = {
 module storageContribRoleUser 'core/security/role.bicep' = {
   name: 'storage-contribrole-user'
   params: {
-    principalId: obj
+    principalId: principalId
     roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
     principalType: 'User'
   }
@@ -396,7 +396,7 @@ module storageContribRoleUser 'core/security/role.bicep' = {
 module searchRoleUser 'core/security/role.bicep' = {
   name: 'search-role-user'
   params: {
-    principalId: obj
+    principalId: principalId
     roleDefinitionId: '1407120a-92aa-4202-b7e9-c0e197c71c8f'
     principalType: 'User'
   }
@@ -405,7 +405,7 @@ module searchRoleUser 'core/security/role.bicep' = {
 module searchContribRoleUser 'core/security/role.bicep' = {
   name: 'search-contrib-role-user'
   params: {
-    principalId: obj
+    principalId: principalId
     roleDefinitionId: '8ebe5a00-799e-43f5-93ac-243d3dce84a7'
     principalType: 'User'
   }
@@ -414,7 +414,7 @@ module searchContribRoleUser 'core/security/role.bicep' = {
 module searchSvcContribRoleUser 'core/security/role.bicep' = {
   name: 'search-svccontrib-role-user'
   params: {
-    principalId: obj
+    principalId: principalId
     roleDefinitionId: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
     principalType: 'User'
   }
